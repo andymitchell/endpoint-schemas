@@ -14,9 +14,21 @@ Goals
 
 E.g. in Supabase, add `endpoint.ts` to each function directory, such as `/supabase/functions/function-name` 
 
-### 2. Specify what is a valid response (and optionally a request) 
+### 2. Specify what is a valid request and response looks like
 
-In `endpoint.ts`, have something like this:
+In `endpoint.ts`, specify a schema in Zod. 
+
+The exported const must be called `EndpointSchemas` (no defaults), and must be in this format:
+```typescript
+type EndpointSchemasType = {
+    [K: 'GET' | 'POST' | 'PUT' | 'DELETE']: {
+        request: z.ZodTypeAny,
+        response: z.ZodTypeAny
+    };
+};
+```
+
+For example:
 
 ```typescript
 import z from "zod";
@@ -35,15 +47,7 @@ export const EndpointSchemas = {
 
 ```
 
-The exported const must be called `EndpointSchemas` (no defaults), and must be in this format:
-```typescript
-type EndpointSchemasType = {
-    [K: 'GET' | 'POST' | 'PUT' | 'DELETE']: {
-        request: z.ZodTypeAny,
-        response: z.ZodTypeAny
-    };
-};
-```
+
 
 ### 3. Validate your actual endpoint (optional)
 
@@ -78,10 +82,12 @@ serve(async (req) => {
 - `npx make-endpoint-schemas-client`
     - It will ask you where your functions are kept, find every `endpoint.ts` within that root (i.e. every endpoint), and output a .ts file in the destination directory that you choose, called `EndpointMap.ts`. 
     - _Recommendation_: Make this part of your build/deploy process
-- In your client/consumer code, import `EndpointMap.ts`
 
+### 5. In your client, consume fully typed responses from your endpoints
 
-#### To fetch a fully type checked endpoint
+You'll import the `EndpointMap.ts` you generated, and use its helper functions to fetch a response. That response will be fully typed, and validated.
+
+#### Example: fetch an endpoint
 
 ```typescript 
 
@@ -95,7 +101,22 @@ if( resource.data?.success ) {
 
 ```
 
-#### To fetch a fully type checked Supabase function
+#### Example: fetch an endpoint manually, and cast its type 
+
+If you don't want to use the `fetchEdge` helper, and prefer a regular fetch:
+
+```typescript 
+
+import {EndpointTypesMap} from './path/to/EndpointMap.ts';
+
+const response = await fetch("http://example.com/endpoint1");
+
+// Manually cast it. Pay attention to match up the endpoint name ("endpoint1") method used ("POST"), and to specify "response". 
+const result = response.json() as unknown as EndpointTypesMap['endpoint1::POST']['response'];
+
+```
+
+#### Example: invoke a Supabase function
 
 As above, but use `invokeEdge` instead of `fetchEdge`
 
