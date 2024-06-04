@@ -1,6 +1,6 @@
 
 
-import { IUserInput, QuestionChain, fileIoNode, getPackageDirectory, stripTrailingSlash } from "@andyrmitchell/file-io";
+import { Answer, IUserInput, QuestionChain, fileIoNode, getPackageDirectory, stripTrailingSlash } from "@andyrmitchell/file-io";
 import { cli } from "./cli"
 
 
@@ -28,13 +28,14 @@ describe('Endpoint schema generation', () => {
     
 
     class TestUserInput implements IUserInput {
-        async ask(questionChain: QuestionChain): Promise<string | undefined> {
+        async ask(questionChain: QuestionChain): Promise<Answer> {
             if( questionChain.name==='endpoint-root-dir' ) {
-                return rootPath;
+                return {type: 'single', answer: rootPath, name: questionChain.name};
             }
             if( questionChain.name==='destination-dir' ) {
-                return testDestPath;
+                return {type: 'single', answer: testDestPath, name: questionChain.name};
             }
+            return {type: 'abort', answer: undefined};
         }
         close(): void {
             throw new Error("Method not implemented.");
