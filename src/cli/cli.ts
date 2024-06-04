@@ -4,7 +4,7 @@ import { IFileIo, IUserInput, getDirectoryFromUser, getInvocationDirectory, getP
 export async function cli(userInput:IUserInput, fileSystem:IFileIo) {
     //console.log("Environment Overview", {'invocation_dir': getInvocationDirectory(), 'invocation_script_dir': await getInvokedScriptDirectory(), 'pkg_dir': await getPackageDirectory()});
 
-    const currentDirectory = getInvocationDirectory();
+    const currentDirectory = await getInvocationDirectory();
     
     const allEndpointDirectories = await fileSystem.list_files(currentDirectory, {recurse: true, file_pattern: /endpoint\.ts$/i});
     const lowestDirectory = allEndpointDirectories.reduce((prev, cur) => {
