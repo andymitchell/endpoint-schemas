@@ -1,6 +1,6 @@
 
 
-import { Answer, IUserInput, QuestionChain, fileIoNode, getPackageDirectory, stripTrailingSlash } from "@andyrmitchell/file-io";
+import { Answer, IUserInput, QuestionChain, TestQuestionAnswerMap, TestUserInput, fileIoNode, getPackageDirectory, stripTrailingSlash } from "@andyrmitchell/file-io";
 import { cli } from "./cli"
 
 
@@ -24,28 +24,20 @@ afterEach(async () => {
     await fileIoNode.remove_directory(testDestPath, true);
 })
 
+function generateTestUserInput():IUserInput {
+    return new TestUserInput({
+        'endpoint-root-dir': {type: 'single', answer: rootPath},
+        'destination-dir': {type: 'single', answer: testDestPath},
+    });
+}
+
 describe('Endpoint schema generation', () => {
     
-
-    class TestUserInput implements IUserInput {
-        async ask(questionChain: QuestionChain): Promise<Answer> {
-            if( questionChain.name==='endpoint-root-dir' ) {
-                return {type: 'single', answer: rootPath, name: questionChain.name};
-            }
-            if( questionChain.name==='destination-dir' ) {
-                return {type: 'single', answer: testDestPath, name: questionChain.name};
-            }
-            return {type: 'abort', answer: undefined};
-        }
-        close(): void {
-            throw new Error("Method not implemented.");
-        }
-    }
 
 
     test('Basic', async () => {
         
-        const userInput:IUserInput = new TestUserInput();
+        const userInput:IUserInput = generateTestUserInput();
         
     
         // Run it
