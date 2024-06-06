@@ -20,7 +20,7 @@ export async function cli(userInput:IUserInput, fileSystem:IFileIo) {
         lowestDirectory? [lowestDirectory] : []
     )
 
-    if( rootAbsoluteUri.type!=='single' ) {
+    if( !rootAbsoluteUri ) {
         console.warn("Aborting - no root path chosen");
         return;
     }
@@ -38,13 +38,13 @@ export async function cli(userInput:IUserInput, fileSystem:IFileIo) {
     )
     // TODO Search a path above, for index.tsx files. Also remember the last chosen one. And accept relative paths. 
 
-    if( destinationAbsoluteUri.type!=='single' ) {
+    if( !destinationAbsoluteUri ) {
         console.warn("Aborting - no destination path chosen");
         return;
     }
 
     
-    await bootstrapTheBundlingScript(fileSystem, rootAbsoluteUri.answer, destinationAbsoluteUri.answer);
+    await bootstrapTheBundlingScript(fileSystem, rootAbsoluteUri, destinationAbsoluteUri);
     
 }
 
@@ -87,7 +87,7 @@ async function bootstrapTheBundlingScript(fileSystem:IFileIo, rootAbsoluteUri:st
         // chmod it, then run it
         await fileSystem.chmod_file(bundlerAbsoluteUri, '755');
         
-        const ouput = await fileSystem.execute_file(bundlerAbsoluteUri);
+        const ouput = await fileSystem.execute(bundlerAbsoluteUri);
         
 
     } finally {
