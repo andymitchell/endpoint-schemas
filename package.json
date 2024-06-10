@@ -1,6 +1,6 @@
 {
   "name": "@andyrmitchell/endpoint-schemas",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Validate Request/Response for a http endpoint (including serverless functions), and generate a TypeScript client for consuming it",
   "exports": {
     ".": {
