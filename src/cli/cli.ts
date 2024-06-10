@@ -1,8 +1,10 @@
-import { IFileIo, IUserInput, getDirectoryFromUser, getInvocationDirectory, getPackageDirectory } from "@andyrmitchell/file-io";
+import { IFileIo, IUserInput, fileIoSyncNode, getDirectoryFromUser, getInvocationDirectory, getPackageDirectory, listSubDirectories } from "@andyrmitchell/file-io";
 
+
+const OUTPUT_FILE = `EndpointMap.ts`;
 
 export async function cli(userInput:IUserInput, fileSystem:IFileIo) {
-    //console.log("Environment Overview", {'invocation_dir': getInvocationDirectory(), 'invocation_script_dir': await getInvokedScriptDirectory(), 'pkg_dir': await getPackageDirectory()});
+    
 
     const currentDirectory = await getInvocationDirectory();
     
@@ -10,14 +12,16 @@ export async function cli(userInput:IUserInput, fileSystem:IFileIo) {
     const lowestDirectory = allEndpointDirectories.reduce((prev, cur) => {
         return ( cur.path.length < prev.length )? cur.path : prev;
     }, allEndpointDirectories[0]?.path ?? '');
+
+    const functionsDirectory = lowestDirectory? fileIoSyncNode.directory_name(lowestDirectory) : '';
     
     const rootAbsoluteUri = await getDirectoryFromUser(
         userInput,
         fileSystem,
-        lowestDirectory,
+        currentDirectory,
         'endpoint-root-dir',
         "What is the root directory of all your endpoints?",
-        lowestDirectory? [lowestDirectory] : []
+        functionsDirectory? [functionsDirectory] : []
     )
 
     if( !rootAbsoluteUri ) {
@@ -25,16 +29,24 @@ export async function cli(userInput:IUserInput, fileSystem:IFileIo) {
         return;
     }
 
+    // Seek out adjacent directories with OUTPUT_FILE in them 
+    let targetDirectories = [
+        `${currentDirectory}/temp`,
+        `${currentDirectory}/dist`
+    ]
+    const allDirectories = await listSubDirectories(fileIoSyncNode.directory_name(currentDirectory), targetDirectories);
+    targetDirectories = [
+        ...allDirectories.filter(x => fileIoSyncNode.has_file(`${x}/${OUTPUT_FILE}`)),
+        ...targetDirectories
+    ]
+
     const destinationAbsoluteUri  = await getDirectoryFromUser(
         userInput,
         fileSystem,
-        lowestDirectory,
+        currentDirectory,
         'destination-dir',
         "In which directory should the generated consumer client be placed?",
-        [
-            `${currentDirectory}/temp`,
-            `${currentDirectory}/dist`
-        ]
+        targetDirectories
     )
     // TODO Search a path above, for index.tsx files. Also remember the last chosen one. And accept relative paths. 
 
@@ -76,7 +88,7 @@ async function bootstrapTheBundlingScript(fileSystem:IFileIo, rootAbsoluteUri:st
         );
         fileContents = fileContents.replace(
             /^OUTPUT_CLIENT_TYPESCRIPT=.*$/gm, 
-            `OUTPUT_CLIENT_TYPESCRIPT="${destinationAbsoluteUri}/EndpointMap.ts"`
+            `OUTPUT_CLIENT_TYPESCRIPT="${destinationAbsoluteUri}/${OUTPUT_FILE}"`
         );
 
         // Write it to temp

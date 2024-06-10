@@ -1,3 +1,5 @@
+// Do not edit. This is auto-generated in the server/API project by @andyrmitchell/endpoint-schemas.
+
 import z, { ZodType } from "zod"; // #EXPORT-REMOVE-PLACEHOLDER
 import { FunctionsHttpError, SupabaseClient } from "@supabase/supabase-js"; // #EXPORT-REMOVE-PLACEHOLDER
 const EndpointSchemasMap = {'endpointName::endpointMethod': {request: z.object({}), response: z.object({})}}; type EndpointTypesMap = typeof EndpointSchemasMap; // #EXPORT-REMOVE-PLACEHOLDER
