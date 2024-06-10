@@ -86,9 +86,10 @@ async function bootstrapTheBundlingScript(fileSystem:IFileIo, rootAbsoluteUri:st
             /^ROOT_DIR=.*$/gm, 
             `ROOT_DIR="${rootAbsoluteUri}"`
         );
+        const outputUri = `${destinationAbsoluteUri}/${OUTPUT_FILE}`;
         fileContents = fileContents.replace(
             /^OUTPUT_CLIENT_TYPESCRIPT=.*$/gm, 
-            `OUTPUT_CLIENT_TYPESCRIPT="${destinationAbsoluteUri}/${OUTPUT_FILE}"`
+            `OUTPUT_CLIENT_TYPESCRIPT="${outputUri}"`
         );
 
         // Write it to temp
@@ -101,6 +102,11 @@ async function bootstrapTheBundlingScript(fileSystem:IFileIo, rootAbsoluteUri:st
         
         const ouput = await fileSystem.execute(bundlerAbsoluteUri);
         
+        if( fileIoSyncNode.has_file(outputUri) ) {
+            console.log(`Output complete at ${outputUri}`)
+        } else {
+            throw new Error(`File not found at ${outputUri}`);
+        }
 
     } finally {
         if( !hadTmp ) {

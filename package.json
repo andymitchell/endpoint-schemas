@@ -20,7 +20,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "bin": {
-    "make-endpoint-schemas-client": "dist/make-endpoint-schemas-client-cli.mjs"
+    "endpoint-schemas": "dist/make-endpoint-schemas-client-cli.mjs"
   },
   "type": "commonjs",
   "files": [

@@ -5,3 +5,4 @@ dist
 test_cli
 .DS_Store
 tmp
+temp

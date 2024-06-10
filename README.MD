@@ -78,7 +78,7 @@ serve(async (req) => {
 ### 4. Generate TypeScript for any client of your API / serverless functions
 
 - In Terminal, go to your package root
-- Make sure you've installed this package (`npm i @andyrmitchell/endpoint-schemas`)
+- Make sure you've installed this package (`npm i @andyrmitchell/endpoint-schemas -D`). The -D is optional.
 - `npx make-endpoint-schemas-client`
     - It will ask you where your functions are kept, find every `endpoint.ts` within that root (i.e. every endpoint), and output a .ts file in the destination directory that you choose, called `EndpointMap.ts`. 
     - _Recommendation_: Make this part of your build/deploy process
